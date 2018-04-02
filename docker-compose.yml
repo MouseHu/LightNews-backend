@@ -1,0 +1,56 @@
+version: '3'
+services:
+
+    db:
+        container_name: postgres
+        image: postgres
+        environment:
+            POSTGRES_PASSWORD: password123 # <-- For example
+        volumes:
+        - pgdata:/var/lib/postgresql/data/
+        ports:
+         - "5432:5432"
+
+    nginx:
+        container_name: nginx-container        
+        build: ./nginx
+        restart: always
+        ports:
+         - "8080:80" 
+        # (HOST:CONTAINER)
+        volumes:        
+        - socket:/socket
+        # - ./log:/var/log/nginx    
+        links:
+        - api          
+        depends_on:
+        - api
+
+    api:
+        container_name: api-container
+        build: ./api        
+        restart: always
+        # command: uwsgi  --emperor uwsgi.ini         
+        command: uwsgi --ini uwsgi.ini         
+        volumes:
+        - socket:/socket
+        - ./api:/docker_api        
+        depends_on:
+        - db
+        links:
+        - db
+
+    adminer:
+        container_name: adminer
+        image: adminer
+        ports:
+        - "8081:8080"     
+        depends_on:
+        - db
+        links:
+        - db
+
+volumes:
+    socket:
+    pgdata:
+
