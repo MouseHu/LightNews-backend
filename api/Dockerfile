@@ -7,5 +7,5 @@ WORKDIR /docker_api
 COPY ./requirements.txt /
 
 # RUN pip install -r requirements.txt
-RUN pip install -i https://pypi.tuna.tsinghua.edu.cn/simple  -r /requirements.txt
+RUN pip install -r /requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple  
 

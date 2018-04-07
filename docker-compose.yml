@@ -20,6 +20,7 @@ services:
         # (HOST:CONTAINER)
         volumes:        
         - socket:/socket
+        - ./api:/docker_api
         # - ./log:/var/log/nginx    
         links:
         - api          

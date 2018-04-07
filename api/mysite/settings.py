@@ -33,7 +33,9 @@ ALLOWED_HOSTS = ['127.0.0.1','localhost']
 INSTALLED_APPS = [
     #'daily.apps.DailyConfig',
     #'quickstart.apps.QuickstartConfig'
-    #'rest_framework',
+    'rest_framework',
+    'reader.apps.ReaderConfig',
+    'core.apps.CoreConfig',
     #'polls.apps.PollsConfig',
     'django.contrib.admin',
     'helloworld.apps.HelloworldConfig',
