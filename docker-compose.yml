@@ -9,7 +9,7 @@ services:
         volumes:
         - pgdata:/var/lib/postgresql/data/
         ports:
-         - "5432:5432"
+         - "15432:5432"
 
     nginx:
         container_name: nginx-container        
@@ -17,10 +17,12 @@ services:
         restart: always
         ports:
          - "8080:80" 
+         - "4433:443"
         # (HOST:CONTAINER)
         volumes:        
         - socket:/socket
         - ./api:/docker_api
+        - /etc/letsencrypt/archive/api.li-positive-one.com:/etc/letsencrypt/archive/api.li-positive-one.com
         # - ./log:/var/log/nginx    
         links:
         - api          

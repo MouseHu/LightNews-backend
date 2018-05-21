@@ -25,7 +25,7 @@ SECRET_KEY = 'm-18(48!@m%^9m*^8ax(-e5jo1o-+q9a&c%%(8nh&5j)0tanv@'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost']
+ALLOWED_HOSTS = ['127.0.0.1','localhost','api.li-positive-one.com']
 
 
 # Application definition
