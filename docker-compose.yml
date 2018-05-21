@@ -41,6 +41,9 @@ services:
         links:
         - db
 
+    elasticsearch:
+        image: elasticsearch:latest  
+
     adminer:
         container_name: adminer
         image: adminer

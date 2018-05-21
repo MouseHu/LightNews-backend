@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer ,ArticleSerializer
-from .models import Article
+from .serializers import UserSerializer, GroupSerializer ,ArticleSerializer,MediaSerializer
+from .models import Article,Media
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -26,3 +26,10 @@ class ArticleViewSet(viewsets.ModelViewSet):
     """
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+
+class MediaViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Media.objects.all()
+    serializer_class = MediaSerializer
