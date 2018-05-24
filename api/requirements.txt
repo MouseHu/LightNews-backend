@@ -1,4 +1,5 @@
 django==2.0
 djangorestframework
+django-filter
 psycopg2
 uwsgi

@@ -25,10 +25,7 @@ django仍然运行在debug模式下（自动重新加载代码），方便调试
    docker exec -it <Container ID> bash 
 
    在打开的bash中运行：
+   python manage.py makemigrations core reader
    python manage.py migrate
    python manage.py createsuperuser
    python manage.py collectstatic
-   python manage.py makemigrations reader
-   python manage.py migrate reader
-   python manage.py migrate
-   ```

@@ -1,31 +1,44 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from .serializers import UserSerializer, GroupSerializer ,ArticleSerializer,MediaSerializer
+from .serializers import ArticleSerializer,MediaSerializer,DetailArticleSerializer
 from .models import Article,Media
+from django_filters import rest_framework as filters
+from rest_framework import generics
+from rest_framework import permissions
+from rest_framework.response import Response
 
-
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
     queryset = Article.objects.all()
-    serializer_class = ArticleSerializer
+    serializer_class = DetailArticleSerializer
+    filter_fields = ('title','source')
+    def list(self,request):
+        queryset = Article.objects.all()
+        serializer = ArticleSerializer(queryset, context={'request': request},many=True)
+        return Response(serializer.data)
+
+        #filter_fields = ('title','source')
+
+
+# class DArticleViewSet(viewsets.ModelViewSet):
+#     queryset = Article.objects.all()
+#     serializer_class = DArticleSerializer
+#     filter_fields = ('title',)
+
+
+#    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+
+# class DArticleList(generics.ListCreateAPIView):
+#     queryset = Article.objects.all()
+#     serializer_class = DArticleSerializer
+#     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+
+
+# class DArticleDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Article.objects.all()
+#     serializer_class = DArticleSerializer
+
 
 class MediaViewSet(viewsets.ModelViewSet):
     """

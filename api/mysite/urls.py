@@ -16,21 +16,35 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-#from django.conf.urls import url,include
+# from django.conf.urls import url,include
 
 
 from rest_framework import routers
-from reader import views
+from reader import views as reader_views
+from core import views as core_views
+
+from rest_framework.authtoken import views
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
-router.register(r'articles', views.ArticleViewSet)
-router.register(r'media', views.MediaViewSet)
+router.register(r'users', core_views.UserViewSet)
+router.register(r'groups', core_views.GroupViewSet)
+
+# router.register(r'ppage', views.DArticleViewSet)
+# router.register(r'pagelist', views.DArticleList)
+# router.register(r'pagedetail', views.DArticleDetail)
+router.register(r'media', reader_views.MediaViewSet)
+router.register(r'articles', reader_views.ArticleViewSet)
+router.register(r'words', core_views.WordViewSet)
+router.register(r'wordlist', core_views.WordlistViewSet)
+router.register(r'userprofile', core_views.UserProfileViewSet)
 
 urlpatterns = [
     path(r'', include(router.urls)),
     path(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('test/', include('helloworld.urls')),
     path('admin/', admin.site.urls)
+]
+
+urlpatterns += [
+    path(r'api-token-auth/', views.obtain_auth_token)
 ]
