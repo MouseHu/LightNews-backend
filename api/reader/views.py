@@ -15,7 +15,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     filter_fields = ('title','source')
     def list(self,request):
         queryset = Article.objects.all()
-        serializer = ArticleSerializer(queryset, context={'request': request},many=True)
+        serializer = ArticleSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 
         #filter_fields = ('title','source')

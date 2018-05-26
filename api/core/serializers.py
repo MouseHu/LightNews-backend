@@ -18,11 +18,11 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Word
-        fields = ('id', 'raw', 'meaning')
+        fields = ('raw', 'meaning')
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    # glossary =  WordSerializer(many=True)
+    glossary =  WordSerializer(many=True)
     class Meta:
         model = UserProfile
         fields = ('id', 'user', 'glossary')
