@@ -24,7 +24,7 @@ from reader import views as reader_views
 from core import views as core_views
 
 from rest_framework.authtoken import views
-
+from rest_framework.documentation import include_docs_urls
 router = routers.DefaultRouter()
 router.register(r'users', core_views.UserViewSet)
 router.register(r'groups', core_views.GroupViewSet)
@@ -32,11 +32,16 @@ router.register(r'groups', core_views.GroupViewSet)
 # router.register(r'ppage', views.DArticleViewSet)
 # router.register(r'pagelist', views.DArticleList)
 # router.register(r'pagedetail', views.DArticleDetail)
+
 router.register(r'media', reader_views.MediaViewSet)
 router.register(r'articles', reader_views.ArticleViewSet)
+
 router.register(r'words', core_views.WordViewSet)
 router.register(r'wordlist', core_views.WordlistViewSet)
+
 router.register(r'userprofile', core_views.UserProfileViewSet)
+router.register(r'userwordlist', core_views.UserWordlistViewSet)
+
 
 urlpatterns = [
     path(r'', include(router.urls)),
@@ -46,5 +51,6 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path(r'api-token-auth/', views.obtain_auth_token)
+    path(r'api-token-auth/', views.obtain_auth_token),
+    path(r'docs/', include_docs_urls(title='LightNews API'))
 ]
