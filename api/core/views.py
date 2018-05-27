@@ -1,12 +1,21 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
+from rest_framework.views import APIView
 from .serializers import *
 from .models import Word, UserProfile, Wordlist
 from .permissions import *
+from rest_framework.compat import coreapi, coreschema
 from rest_framework import permissions
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.response import Response
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.response import Response
+from rest_framework.schemas import ManualSchema
+from rest_framework.views import APIView
+
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -19,6 +28,54 @@ class GroupViewSet(viewsets.ModelViewSet):
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+
+class DevAuthToken(APIView):
+    """
+    匿名用户凭借设备号获得token和user id。
+
+    create:
+    通过devid获取token.
+    对于新设备会自动注册新的userid。
+
+    """
+    if coreapi is not None and coreschema is not None:
+        schema = ManualSchema(
+            fields=[
+                coreapi.Field(
+                    name="username",
+                    required=True,
+                    location='form',
+                    schema=coreschema.String(
+                        title="DevID",
+                        description="Device ID",
+                    ),
+                ),
+            ],
+            encoding="application/json",
+        )
+
+    def post(self, request, *args, **kwargs):
+        serializer = DevUserSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            user = User.objects.get(username=hash(serializer.validated_data['username']))  # retrieve the user using username
+        except User.DoesNotExist:
+            user = serializer.create(serializer.validated_data)  # return false as user does not exist
+        else:
+            pass
+
+      #  user = serializer.validated_data['user']
+
+        token, created = Token.objects.get_or_create(user=user)
+
+
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+        })
+
 
 
 class WordViewSet(viewsets.ModelViewSet):

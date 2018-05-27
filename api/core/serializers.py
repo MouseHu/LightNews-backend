@@ -18,14 +18,14 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class WordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Word
-        fields = ('id', 'raw', 'meaning')
+        fields = ('raw', 'meaning')
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     # glossary =  WordSerializer(many=True)
     class Meta:
         model = UserProfile
-        fields = ('id', 'user', 'nickname')
+        fields = ('user', 'nickname')
 
 
 class UserWordlistSerializer(serializers.ModelSerializer):
@@ -33,7 +33,7 @@ class UserWordlistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ('id', 'user', 'glossary')
+        fields = ('user', 'glossary')
 
 
 class WordlistSerializer(serializers.ModelSerializer):
@@ -41,3 +41,22 @@ class WordlistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wordlist
         fields = ('id', 'userprofile', 'word')
+
+
+class DevUserSerializer(serializers.ModelSerializer):
+    # glossary =  WordSerializer(many=True)
+    class Meta:
+        model = User
+        fields = ('username',)
+
+    def create(self, validated_data):
+
+        user = User.objects.create(
+            username=hash(validated_data['username'])
+        )
+        user.set_password(validated_data['username'])
+        user.save()
+        userp=UserProfileSerializer()
+        userp.create(validated_data={'user': user})
+        return user
+
