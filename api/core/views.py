@@ -15,7 +15,12 @@ from rest_framework.response import Response
 from rest_framework.response import Response
 from rest_framework.schemas import ManualSchema
 from rest_framework.views import APIView
+import hashlib
 
+def my_md5(dev_id):
+    hl = hashlib.md5()
+    hl.update(dev_id.encode(encoding='utf-8'))
+    return hl.hexdigest()
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -60,7 +65,7 @@ class DevAuthToken(APIView):
         serializer.is_valid(raise_exception=True)
 
         try:
-            user = User.objects.get(username=hash(serializer.validated_data['username']))  # retrieve the user using username
+            user = User.objects.get(username=my_md5(serializer.validated_data['username']))  # retrieve the user using username
         except User.DoesNotExist:
             user = serializer.create(serializer.validated_data)  # return false as user does not exist
         else:

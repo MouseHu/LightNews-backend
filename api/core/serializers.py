@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Word, UserProfile, Wordlist
-
+import hashlib
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -43,6 +43,12 @@ class WordlistSerializer(serializers.ModelSerializer):
         fields = ('id', 'userprofile', 'word')
 
 
+def my_md5(dev_id):
+    hl = hashlib.md5()
+    hl.update(dev_id.encode(encoding='utf-8'))
+    return hl.hexdigest()
+
+
 class DevUserSerializer(serializers.ModelSerializer):
     # glossary =  WordSerializer(many=True)
     class Meta:
@@ -52,7 +58,7 @@ class DevUserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         user = User.objects.create(
-            username=hash(validated_data['username'])
+            username=my_md5(validated_data['username'])
         )
         user.set_password(validated_data['username'])
         user.save()
