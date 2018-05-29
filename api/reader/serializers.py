@@ -15,4 +15,4 @@ class ArticleSerializer(serializers.HyperlinkedModelSerializer):
 class DetailArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = ('title','source','abstract','content','from_media','pub_date')
+        fields = ('title','source','abstract','content','from_media','pub_date','img_url')
