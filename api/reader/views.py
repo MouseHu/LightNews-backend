@@ -15,7 +15,7 @@ class recommend_article(generics.ListAPIView):
         user = self.request.user
         return Article.objects.all().order_by('title')
 
-    serializer_class = DetailArticleSerializer
+    serializer_class = ArticleSerializer
 
 class ArticleViewSet(viewsets.ModelViewSet):
     """
