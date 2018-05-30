@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import  Word,UserProfile
+from core.models import  Word,UserProfile
 
 # class UserAdmin(admin.ModelAdmin):
 #     list_display = ('name', 'homepage') # list

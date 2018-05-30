@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Word, UserProfile, Wordlist
+from core.models import Word, UserProfile, Wordlist
 import hashlib
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):

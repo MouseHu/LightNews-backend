@@ -1,21 +1,13 @@
-from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from rest_framework.views import APIView
-from .serializers import *
-from .models import Word, UserProfile, Wordlist
-from .permissions import *
-from rest_framework.compat import coreapi, coreschema
-from rest_framework import permissions
-from django_filters import rest_framework as filters
-from rest_framework import generics
-from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from rest_framework.response import Response
+from rest_framework.compat import coreapi, coreschema
 from rest_framework.response import Response
 from rest_framework.schemas import ManualSchema
 from rest_framework.views import APIView
-import hashlib
+
+from core.permissions import *
+from core.serializers import *
+
 
 def my_md5(dev_id):
     hl = hashlib.md5()
@@ -100,7 +92,7 @@ class WordViewSet(viewsets.ModelViewSet):
     """
     queryset = Word.objects.all()
     serializer_class = WordSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, permissions.IsAdminUser) #only admin is able to add words
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )#permissions.IsAdminUser) #only admin is able to add words
 
 
 class WordlistViewSet(viewsets.ModelViewSet):
@@ -122,6 +114,27 @@ class WordlistViewSet(viewsets.ModelViewSet):
     queryset = Wordlist.objects.all()
     serializer_class = WordlistSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, wordlist_permission) # any one can edit itself wordlist
+
+class WordlistViewSet(viewsets.ModelViewSet):
+    """
+    list:
+    列出所有的用户-生词对。此条API不应该被调用。
+
+    retrieve:
+    返回某个用户-生词对。此条API一般情况下不应该被调用。
+
+    create:
+    给某个用户的生词本添加一个生词。
+
+    delete:
+    给某个用户的生词本删除一个生词。
+
+    """
+
+    queryset = Wordlist.objects.all()
+    serializer_class = WordlistSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, wordlist_permission) # any one can edit itself wordlist
+
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):

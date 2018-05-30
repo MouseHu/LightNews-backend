@@ -1,14 +1,21 @@
-from django.contrib.auth.models import User, Group
-from rest_framework import viewsets
-from .serializers import ArticleSerializer,MediaSerializer,DetailArticleSerializer
-from .models import Article,Media
-from .permissions import *
-from django_filters import rest_framework as filters
 from rest_framework import generics
-from rest_framework import permissions
+from rest_framework import viewsets
 from rest_framework.response import Response
 
+from reader.permissions import *
+from reader.serializers import *
 
+
+class recommend_article(generics.ListAPIView):
+    """
+    返回推荐的文章列表
+    """
+
+    def get_queryset(self):
+        user = self.request.user
+        return Article.objects.all().order_by('title')
+
+    serializer_class = DetailArticleSerializer
 
 class ArticleViewSet(viewsets.ModelViewSet):
     """
@@ -25,7 +32,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
     删除一条新闻。只有管理员才有权限删除。
     """
 
-    def list(self,request):
+    def list(self, request):
         queryset = Article.objects.all()
         serializer = ArticleSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
@@ -33,10 +40,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = DetailArticleSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    #filter_fields = ('title','source')  # 暂时先不提供搜索功能
+    # filter_fields = ('title','source')  # 暂时先不提供搜索功能
 
-
-        #filter_fields = ('title','source')
+    # filter_fields = ('title','source')
 
 
 # class DArticleViewSet(viewsets.ModelViewSet):

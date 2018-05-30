@@ -14,6 +14,7 @@ class Article(models.Model):
     img_url = models.URLField(help_text="新闻图片地址",default="")
     abstract =  models.CharField(max_length=1000,default='No abstract',help_text="新闻的摘要，用在列表视图中")
     source = models.URLField(help_text="新闻原文地址")
+    author=models.CharField(max_length=500,help_text="新闻作者",default="")
     from_media= models.ForeignKey(Media,on_delete=models.CASCADE,null=True,help_text="新闻来源媒体")
     pub_date = models.DateField('date published',help_text="新闻日期")
 
