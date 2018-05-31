@@ -20,3 +20,8 @@ class wordlist_permission(permissions.BasePermission):
 
         # Write permissions are only allowed to the owner of the snippet.
         return obj.userprofile.user == request.user
+
+
+class IsAdminOrIsSelf(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user or request.user.is_staff or request.user.is_superuser
