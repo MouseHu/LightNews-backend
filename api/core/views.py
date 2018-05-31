@@ -142,11 +142,12 @@ class WordlistViewSet(viewsets.ModelViewSet):
         删除一个用户-单词对。注意，使用了POST方法。
         """
         # retrieve the selected items
-        qs = self.filter_queryset(self.get_queryset())
-        # delete the selected item
-        qs.delete()
-        # return deleted
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        # serializer = WordlistSerializer(data=request.data, context={'request': request})
+
+        todelete=self.get_queryset().filter(userprofile=request.data['userprofile'], word=request.data['word'])
+        status=todelete.delete()
+        return Response({'delete item': status})
+
 
 
     filter_fields = ('userprofile','word')

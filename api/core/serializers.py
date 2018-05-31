@@ -40,7 +40,7 @@ class WordlistSerializer(serializers.ModelSerializer):
     # glossary =  WordSerializer(many=True)
     class Meta:
         model = Wordlist
-        fields = ('id', 'userprofile', 'word')
+        fields = ('userprofile', 'word')
 
 
 def my_md5(dev_id):
