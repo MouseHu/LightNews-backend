@@ -14,14 +14,15 @@ class Crawler(object):
        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36'
         }
         self.news=[];
-    def post_page(self,title,content,source,date,from_media=None, abstract="No abstract"):
+    def post_page(self,title,content,source,date,from_media=None, abstract="No abstract",img_url=""):
         textmod={
         "title": title,
         "source": source,
         "abstract": abstract,
         "content": content,
         "from_media": from_media,
-        "pub_date": date
+        "pub_date": date,
+        "img_url": img_url
         }
         header_dict = {'Authorization': 'Token 7ef5bc0c59773e1c1a708b06c7d04114e56939f9','Content-Type':'application/json'}
 
@@ -42,7 +43,7 @@ class Crawler(object):
 
         for new in self.news:
 
-            self.post_page(title=new["title"], content=new["content"],source=new["source"],from_media=new["from_media"],date=new["pub_date"])
+            self.post_page(title=new["title"], content=new["content"],source=new["source"],from_media=new["from_media"],date=new["pub_date"],img_url=new["img_url"])
 class CNNCrawler(Crawler):
     def __init__(self):
         #self.html=[]
@@ -97,6 +98,7 @@ class CNNCrawler(Crawler):
             assert media is not None
             nNewsURL=media.contents[0]["href"]
             nImgURL=(media.find("img")["data-src-medium"]).strip("/")
+            nImgURL="http://"+nImgURL
             #print("holy why?")
             try:
                 #print("why?")
@@ -113,7 +115,7 @@ class CNNCrawler(Crawler):
             nNewsContent,nNewsDate=self.openNews(nNewsURL)
             print(nNewsDate)
             submit={"title": nTitle,"source":self.basicURL+nNewsURL, "abstract": nAbstract,
-        "content": nNewsContent,"from_media": "CNN", "pub_date": nNewsDate}
+        "content": nNewsContent,"from_media": "CNN", "pub_date": nNewsDate,"img_url":nImgURL}
             self.news.append(submit)
             #print(type(submit))
             #results.append(news)
@@ -135,8 +137,10 @@ class ChinaDailyCrawler(Crawler):
 
         soup = BeautifulSoup(response,'html.parser')
 
-        date=soup.find(attrs={"class":"info_l"}).text.split("Updated:")[1]
+        date=soup.find(attrs={"class":"info_l"}).text.split("Updated: ")[1]
+        print(date)
         date=date.split(" ")[0]
+        print(date)
         text=soup.find(attrs={"id":"Content"})
 
         story=""
@@ -191,14 +195,16 @@ class ChinaDailyCrawler(Crawler):
                 
             print(nNewsContent,nNewsDate)
                 
-            submit={"title": nTitle,"source":nNewsURL, "abstract": nAbstract,"content": nNewsContent,"from_media": "ChinaDaily","pub_date": nNewsDate}
+            submit={"title": nTitle,"source":nNewsURL, "abstract": nAbstract,"content": nNewsContent,"from_media": "CGTN","img_url":nImgURL,"pub_date": nNewsDate}
             self.news.append(submit)
         return
 def craw():
     print("begin")
-    cnn=CNNCrawler()
-    cnn.craw()
-    print("cnn news craw over")
     chinadaily=ChinaDailyCrawler()
     chinadaily.craw()
     print("china daily news craw over")
+    print("begin")
+    cnn=CNNCrawler()
+    cnn.craw()
+    print("cnn news craw over")
+    
