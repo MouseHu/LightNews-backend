@@ -4,7 +4,12 @@ from rest_framework.compat import coreapi, coreschema
 from rest_framework.response import Response
 from rest_framework.schemas import ManualSchema
 from rest_framework.views import APIView
-
+from django.contrib.auth.models import User
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import permissions
+from rest_framework.decorators import list_route
 from core.permissions import *
 from core.serializers import *
 
@@ -131,6 +136,21 @@ class WordlistViewSet(viewsets.ModelViewSet):
 
     """
 
+    @action(methods=['post'],detail=False)
+    def delete_post(self, request, *arg, **kwarg):
+        """
+        删除一个用户-单词对。注意，使用了POST方法。
+        """
+        # retrieve the selected items
+        # serializer = WordlistSerializer(data=request.data, context={'request': request})
+
+        todelete=self.get_queryset().filter(userprofile=request.data['userprofile'], word=request.data['word'])
+        status=todelete.delete()
+        return Response({'delete item': status})
+
+
+
+    filter_fields = ('userprofile','word')
     queryset = Wordlist.objects.all()
     serializer_class = WordlistSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, wordlist_permission) # any one can edit itself wordlist
@@ -152,6 +172,23 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     删除一条用户资料。此条API不应该被调用。
 
     """
+
+    # @action(methods=['GET','POST','DELETE'], detail=True, permission_classes=[IsAdminOrIsSelf])
+    # def vocabulary(self, request, pk=None):
+    #     if request.method == 'GET':
+    #         profile = self.get_object()
+    #         serializer=UserWordlistSerializer(profile)
+    #         return Response(serializer.data)
+    #
+    #     if request.method == 'POST':
+    #         self.serializer_class = WordlistSerializer
+    #         serializer=WordlistSerializer(data=request.data)
+    #         if serializer.is_valid():
+    #             serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, userprofile_permission) # any one can edit itself UserProfile
