@@ -1,7 +1,7 @@
 # PKUReader-backend
 backend for PKUReader 
 
-
+文档：https://api.li-positive-one.com:4433/docs/
 
 ## Deployment by docker-compose:
 
@@ -9,7 +9,6 @@ backend for PKUReader
 
 django仍然运行在debug模式下（自动重新加载代码），方便调试。
 
-数据库的5432的端口暴露在主机上，方便其他程序（如爬虫）调用
 
 1. 安装 docker-ce and docker-compose
 
@@ -25,7 +24,7 @@ django仍然运行在debug模式下（自动重新加载代码），方便调试
    docker exec -it <Container ID> bash 
 
    在打开的bash中运行：
-   python manage.py makemigrations core reader
+   python manage.py makemigrations
    python manage.py migrate
    python manage.py createsuperuser
    python manage.py collectstatic
