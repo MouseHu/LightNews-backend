@@ -1,0 +1,5 @@
+
+
+Article:
+
+POST  http://{website}/articles/
