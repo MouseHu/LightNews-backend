@@ -1,4 +1,4 @@
-#import spiderapi
+﻿#import spiderapi
 import datetime
 import json
 import requests
@@ -39,7 +39,8 @@ class Crawler(object):
         return
     def craw(self):
         self.news=[]
-        self.getNews(self.crawURL)
+        for url in self.crawURL:
+            self.getNews(url)
 
         for new in self.news:
 
@@ -49,7 +50,7 @@ class CNNCrawler(Crawler):
         #self.html=[]
         super(CNNCrawler,self).__init__()   
         self.basicURL="https://edition.cnn.com"
-        self.crawURL="https://edition.cnn.com/regions"
+        self.crawURL=["https://edition.cnn.com/regions"]
     def openNews(self,url):
         request = urllib.request.Request(self.basicURL+url, headers= self.header)
 
@@ -125,7 +126,7 @@ class ChinaDailyCrawler(Crawler):
     def __init__(self):
         super(ChinaDailyCrawler,self).__init__()   
         self.basicURL="http://www.chinadaily.com.cn/world"
-        self.crawURL="http://www.chinadaily.com.cn/world"
+        self.crawURL=["http://www.chinadaily.com.cn/world","http://www.chinadaily.com.cn/china","http://www.chinadaily.com.cn/culture","http://www.chinadaily.com.cn/life"]
     def getContents(self,url,story):
         
         return
@@ -136,7 +137,7 @@ class ChinaDailyCrawler(Crawler):
         response = urllib.request.urlopen(request).read()
 
         soup = BeautifulSoup(response,'html.parser')
-
+        
         date=soup.find(attrs={"class":"info_l"}).text.split("Updated: ")[1]
         print(date)
         date=date.split(" ")[0]
@@ -171,12 +172,23 @@ class ChinaDailyCrawler(Crawler):
         request = urllib.request.Request(url, headers= self.header)
         response = urllib.request.urlopen(request).read()
         soup = BeautifulSoup(response,'html.parser')
+        #print(soup)
         news=soup.find(attrs={"class":"carousel-inner"})#滚动新闻
+        print(news)
         for n in news.children:
             if isinstance(n,(bs4.element.NavigableString,bs4.element.Comment)):
                 continue
-            nContent=n.contents[3].contents[1].contents[0]
-            nPic=n.contents[1].contents[1]
+            #print(n,url,re.match("world",url))
+            if re.search("world",url) is not None:
+                nContent=n.contents[3].contents[1].contents[0]
+                nPic=n.contents[1].contents[1]
+            else:
+                #print(n.contents)
+                ##print(n.contents[3].contents)
+                #print(n.contents[3].contents[0].contents)
+                nContent=n.contents[3].contents[0].contents[0]
+                nPic=n.contents[1].contents[0]
+                #print(nContent,nPic)
             
             assert nContent is not None
             assert nPic is not None
@@ -207,4 +219,3 @@ def craw():
     cnn=CNNCrawler()
     cnn.craw()
     print("cnn news craw over")
-    
