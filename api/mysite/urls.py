@@ -34,7 +34,7 @@ router.register(r'groups', core_views.GroupViewSet)
 # router.register(r'pagelist', views.DArticleList)
 # router.register(r'pagedetail', views.DArticleDetail)
 
-router.register(r'media2', reader_views.MediaViewSet)
+router.register(r'Media', reader_views.MediaViewSet)
 router.register(r'articles', reader_views.ArticleViewSet)
 
 router.register(r'words', core_views.WordViewSet)
