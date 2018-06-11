@@ -1,4 +1,4 @@
-# PKUReader-backend
+﻿# PKUReader-backend
 backend for PKUReader 
 
 文档：https://api.li-positive-one.com:4433/docs/
@@ -28,3 +28,17 @@ django仍然运行在debug模式下（自动重新加载代码），方便调试
    python manage.py migrate
    python manage.py createsuperuser
    python manage.py collectstatic
+
+
+## crawler usage:
+```
+	import crawler2
+	crawler2.craw()
+```
+you can also specify the source:
+```
+	import crawler2
+	chinadaily=crawler2.ChinaDailyCrawler()
+	chinadaily.craw()
+```
+=======

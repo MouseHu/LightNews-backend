@@ -1,3 +1,4 @@
+# %load crawler2.py
 #import spiderapi
 import datetime
 import json
@@ -39,17 +40,17 @@ class Crawler(object):
         return
     def craw(self):
         self.news=[]
-        self.getNews(self.crawURL)
+        for url in self.crawURL:
+            self.getNews(url)
 
         for new in self.news:
-
             self.post_page(title=new["title"], content=new["content"],source=new["source"],from_media=new["from_media"],date=new["pub_date"],img_url=new["img_url"])
 class CNNCrawler(Crawler):
     def __init__(self):
         #self.html=[]
         super(CNNCrawler,self).__init__()   
         self.basicURL="https://edition.cnn.com"
-        self.crawURL="https://edition.cnn.com/regions"
+        self.crawURL=["https://edition.cnn.com/regions"]
     def openNews(self,url):
         request = urllib.request.Request(self.basicURL+url, headers= self.header)
 
@@ -68,14 +69,14 @@ class CNNCrawler(Crawler):
         story=ex.sub("",story)
         story=story.replace("Read More","")
         #news.append(story)
-        print(story)
+        #print(story)
         
         date=soup.find(class_="update-time").text
         date2=date.split(" ")[-4:-1]
         newDate=""
         for i in date2:
             newDate+=i
-        newDate=datetime.datetime.strptime(newDate,"%b%d,%Y")
+        newDate=datetime.datetime.strptime(newDate,"%B%d,%Y")
         newDate=str(newDate).split(" ")[0]
         #print(date2)
         return story,newDate
@@ -94,8 +95,8 @@ class CNNCrawler(Crawler):
             #print("holy why?")
             media=n.find(class_="media")
             content=n.find(class_="cd__content")
-            assert content is not None
-            assert media is not None
+            if content is None or  media is None:
+                continue
             nNewsURL=media.contents[0]["href"]
             nImgURL=(media.find("img")["data-src-medium"]).strip("/")
             nImgURL="http://"+nImgURL
@@ -125,7 +126,14 @@ class ChinaDailyCrawler(Crawler):
     def __init__(self):
         super(ChinaDailyCrawler,self).__init__()   
         self.basicURL="http://www.chinadaily.com.cn/world"
-        self.crawURL="http://www.chinadaily.com.cn/world"
+        self.crawURL=["http://www.chinadaily.com.cn/travel","http://www.chinadaily.com.cn/business","http://www.chinadaily.com.cn/world","http://www.chinadaily.com.cn/china",
+                      "http://www.chinadaily.com.cn/culture","http://www.chinadaily.com.cn/life",
+                      "http://www.chinadaily.com.cn/opinion"]
+        self.types={"http://www.chinadaily.com.cn/business":2,"http://www.chinadaily.com.cn/travel":2,
+                    "http://www.chinadaily.com.cn/world":0,"http://www.chinadaily.com.cn/china":1,"http://www.chinadaily.com.cn/culture":1,"http://www.chinadaily.com.cn/life":0,
+                   "http://www.chinadaily.com.cn/culture":1,"http://www.chinadaily.com.cn/opinion":0
+                   }
+        
     def getContents(self,url,story):
         
         return
@@ -136,11 +144,10 @@ class ChinaDailyCrawler(Crawler):
         response = urllib.request.urlopen(request).read()
 
         soup = BeautifulSoup(response,'html.parser')
-
+        
         date=soup.find(attrs={"class":"info_l"}).text.split("Updated: ")[1]
-        print(date)
         date=date.split(" ")[0]
-        print(date)
+
         text=soup.find(attrs={"id":"Content"})
 
         story=""
@@ -150,38 +157,65 @@ class ChinaDailyCrawler(Crawler):
                     continue
                 story+=p.text+"\n"
             page=soup.find(attrs={"id":"div_currpage"})
+            
             if page is None:
                 break
-            nextPage=page.find(attrs={"class":"pagestyle"})
-            if nextPage is None or nextPage.text !="Next":
-                break;
-            url=nextPage["href"]
+            nextPage=page.find_all(attrs={"class":"pagestyle"})
+            if nextPage is None:
+                break
+            next_flag=False
+            for button in nextPage:
+                if button.text !="Next":
+                    continue
+                url=button["href"]
+                next_flag=True
+            if next_flag==False:
+                break
             request = urllib.request.Request(url, headers= self.header)
             #request = urllib2.Request(url)
             response = urllib.request.urlopen(request).read()
             #print(response)
             soup = BeautifulSoup(response,'html.parser')   
             text=soup.find(attrs={"id":"Content"})
-            #print(story,nextPage)
-            
-        #print(attrs={"id":"Content"})
-        #date=soup.find(class_="update-time").text
         return story,date
     def getNews(self,url):
         request = urllib.request.Request(url, headers= self.header)
         response = urllib.request.urlopen(request).read()
         soup = BeautifulSoup(response,'html.parser')
-        news=soup.find(attrs={"class":"carousel-inner"})#滚动新闻
+        #print(soup)
+        if self.types[url]==2:
+            news=soup.find(attrs={"id":"D1pic1"})#滚动新闻
+        else:
+            news=soup.find(attrs={"class":"carousel-inner"})#滚动新闻
+        #print(news)
         for n in news.children:
             if isinstance(n,(bs4.element.NavigableString,bs4.element.Comment)):
                 continue
-            nContent=n.contents[3].contents[1].contents[0]
-            nPic=n.contents[1].contents[1]
-            
+            #print(n)
+            nURL=""
+            try:
+                if self.types[url]==0:
+                    nContent=n.contents[3].contents[1].contents[0]
+                    nPic=n.contents[1].contents[1]
+                elif self.types[url]==1:
+                    #print(n.contents)
+                    nContent=n.contents[3].contents[0].contents[0]
+
+                    nPic=n.contents[1].contents[0]
+                    #print(nContent,nPic)
+                else:
+                    #print(n.contents[1].contents)
+                    nContent=n.contents[3].contents[1]
+                    nPic=n.contents[1].contents[1]
+                    nURL=n.contents[1]
+            except IndexError:
+                continue
             assert nContent is not None
             assert nPic is not None
-            
-            nNewsURL=nContent["href"]
+            if self.types[url]==2:
+                nNewsURL=nURL["href"]
+            else:
+                nNewsURL=nContent["href"]
             nTitle=nContent.text
             nImgURL=nPic["src"]
             nAbstract=""
@@ -193,7 +227,7 @@ class ChinaDailyCrawler(Crawler):
             if nNewsContent=="":
                 continue
                 
-            print(nNewsContent,nNewsDate)
+            #print(nNewsContent,nNewsDate)
                 
             submit={"title": nTitle,"source":nNewsURL, "abstract": nAbstract,"content": nNewsContent,"from_media": "CGTN","img_url":nImgURL,"pub_date": nNewsDate}
             self.news.append(submit)
@@ -207,4 +241,4 @@ def craw():
     cnn=CNNCrawler()
     cnn.craw()
     print("cnn news craw over")
-    
+craw() 
