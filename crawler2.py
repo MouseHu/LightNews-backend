@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import socket
 import http.client
 import re
+import demjson
 class Crawler(object):
     def __init__(self):
         self.header = {
@@ -60,6 +61,8 @@ class CNNCrawler(Crawler):
         text=soup.find(attrs={"data-zn-id":"body-text"})
 
         story=""
+        if text is None:
+            return None,None
         container=text.contents[0]
         for n in container.children:
             if re.match("zn-body__paragraph",n["class"][0]) is None:
@@ -115,6 +118,8 @@ class CNNCrawler(Crawler):
             print(nNewsURL,nImgURL,nTitle,nAbstract)
             nNewsContent,nNewsDate=self.openNews(nNewsURL)
             print(nNewsDate)
+            if nNewsContent is None or nNewsContent == "":
+                continue
             submit={"title": nTitle,"source":self.basicURL+nNewsURL, "abstract": nAbstract,
         "content": nNewsContent,"from_media": "CNN", "pub_date": nNewsDate,"img_url":nImgURL}
             self.news.append(submit)
@@ -229,7 +234,115 @@ class ChinaDailyCrawler(Crawler):
                 
             #print(nNewsContent,nNewsDate)
                 
-            submit={"title": nTitle,"source":nNewsURL, "abstract": nAbstract,"content": nNewsContent,"from_media": "CGTN","img_url":nImgURL,"pub_date": nNewsDate}
+            submit={"title": nTitle,"source":nNewsURL, "abstract": nAbstract,"content": nNewsContent,"from_media": "ChinaDaily","img_url":nImgURL,"pub_date": nNewsDate}
+            self.news.append(submit)
+        return
+
+class CGTNCrawler(Crawler):
+    def __init__(self):
+        super(CGTNCrawler,self).__init__()   
+        self.header = {
+       'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36 '
+        }
+        self.basicURL="https://www.cgtn.com/news/"
+        self.crawURL=["https://www.cgtn.com/news/section.do?curPage=0&category=1",
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=2",
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=4",
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=5",
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=7",
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=8",
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=9"]
+        self.types={"https://www.cgtn.com/news/section.do?curPage=0&category=1":0,
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=2":0,
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=4":0,
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=5":0,
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=7":0,
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=8":0,
+                      "https://www.cgtn.com/news/section.do?curPage=0&category=9":0
+                   }
+        
+    def getContents(self,url,story):
+        
+        return
+    def openNews(self,url):
+        #print(url)
+        request = urllib.request.Request(url, headers= self.header)
+        response = urllib.request.urlopen(request).read()
+        soup = BeautifulSoup(response,'html.parser')
+        nImgURL=""
+        try:
+            nImgURL=soup.find(attrs={"class":"TopPicture"})["src"]
+        except:
+            pass
+        #print("begin here")
+        #print(soup)
+        #print("end here")
+        content=soup.find(attrs={"class":"m-content"})
+        #print(content)
+        text=demjson.decode(content['data-json'])
+        #print(text)
+        story=""
+        for t in text:
+            if t["contentType"]==1:
+                 story+=t['content']
+        #story=text[0]["content"]
+        #print(story)
+        #story=re.sub(r"</[^>].*?>","\n",story)
+        story=re.sub(r"<[^>].*?>","\n",story)
+        story=re.sub(r"\n+","\n",story)
+        #print(story)
+        if nImgURL=="":
+            try:
+                nImgURL=content.find_all(attrs={"class":"cmsImage"})[0].contents[0]["src"]
+            except:
+                pass
+                #print(content)
+        #if nImgURL=="":
+        #print(story)
+        return story,nImgURL
+    def getNews(self,url):
+        #print(url)
+        request = urllib.request.Request(url, headers= self.header)
+        response = urllib.request.urlopen(request).read()
+        soup = BeautifulSoup(response,'html.parser')
+        #print(soup)
+        if self.types[url]==0:
+            news=soup.find_all(attrs={"class":"m-content-section-description"})+soup.find_all(attrs={"class":"m-content-top-first-description"})#滚动新闻
+        else:
+            news=soup.find(attrs={"class":"carousel-inner"})#滚动新闻
+        #print(news)
+        for n in news:
+            if isinstance(n,(bs4.element.NavigableString,bs4.element.Comment)):
+                continue
+            #print(n)
+            
+            title=n.find(attrs={"class":"title"})
+            content=n.find(attrs={"class":"content"})
+            date=n.find(attrs={"class":"time"})
+            #print(title)
+            try:
+                nTitle=title.contents[0].contents[0].text
+                nNewsURL=title.contents[0].contents[0]["href"]
+            except:
+                nTitle=title.contents[0].text
+                nNewsURL=title.contents[0]["href"]
+            if content is None:
+                nAbstract=""
+            else:
+                nAbstract=content.text
+            nNewsDate=date.contents[0].text.split(" ")[0]
+            #nDate=datetime.datetime.strptime(nDate,"%Y-%m-%d %H:%M ")
+            #nDate=str(nDate).split(" ")[0]
+            
+            print(nNewsURL,nTitle,nAbstract,nNewsDate)
+            nNewsContent,nImgURL=self.openNews(nNewsURL)
+            
+            if nNewsContent=="":
+                continue
+                
+            #print(nNewsContent,nNewsDate)
+                
+            submit={"title": nTitle,"source":nNewsURL, "abstract": nAbstract,"content": nNewsContent,"from_media": "CGTN2","img_url":nImgURL,"pub_date": nNewsDate}
             self.news.append(submit)
         return
 def craw():
@@ -241,4 +354,8 @@ def craw():
     cnn=CNNCrawler()
     cnn.craw()
     print("cnn news craw over")
-craw() 
+    print("begin")
+    cgtn=CGTNCrawler()
+    cgtn.craw()
+    print("cgtn news craw over")
+#craw() 
