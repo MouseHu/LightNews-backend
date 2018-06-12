@@ -33,15 +33,15 @@ class ArticleViewSet(viewsets.ModelViewSet):
     """
 
     def list(self, request):
-        queryset = Article.objects.all()
+        queryset = Article.objects.all().order_by('-pub_date')
         serializer = ArticleSerializer(queryset, context={'request': request}, many=True)
         return Response(serializer.data)
 
     queryset = Article.objects.all()
     serializer_class = DetailArticleSerializer
     permission_classes = (IsAdminOrReadOnly,)
-    # filter_fields = ('title','source')  # 暂时先不提供搜索功能
 
+    # filter_fields = ('title','source')  # 暂时先不提供搜索功能
     # filter_fields = ('title','source')
 
 
