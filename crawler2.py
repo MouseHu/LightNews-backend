@@ -44,7 +44,6 @@ class Crawler(object):
             self.getNews(url)
 
         for new in self.news:
-
             self.post_page(title=new["title"], content=new["content"],source=new["source"],from_media=new["from_media"],date=new["pub_date"],img_url=new["img_url"])
 class CNNCrawler(Crawler):
     def __init__(self):
@@ -96,8 +95,8 @@ class CNNCrawler(Crawler):
             #print("holy why?")
             media=n.find(class_="media")
             content=n.find(class_="cd__content")
-            assert content is not None
-            assert media is not None
+            if content is None or  media is None:
+                continue
             nNewsURL=media.contents[0]["href"]
             nImgURL=(media.find("img")["data-src-medium"]).strip("/")
             nImgURL="http://"+nImgURL
@@ -158,12 +157,20 @@ class ChinaDailyCrawler(Crawler):
                     continue
                 story+=p.text+"\n"
             page=soup.find(attrs={"id":"div_currpage"})
+            
             if page is None:
                 break
-            nextPage=page.find(attrs={"class":"pagestyle"})
-            if nextPage is None or nextPage.text !="Next":
-                break;
-            url=nextPage["href"]
+            nextPage=page.find_all(attrs={"class":"pagestyle"})
+            if nextPage is None:
+                break
+            next_flag=False
+            for button in nextPage:
+                if button.text !="Next":
+                    continue
+                url=button["href"]
+                next_flag=True
+            if next_flag==False:
+                break
             request = urllib.request.Request(url, headers= self.header)
             #request = urllib2.Request(url)
             response = urllib.request.urlopen(request).read()
@@ -186,19 +193,23 @@ class ChinaDailyCrawler(Crawler):
                 continue
             #print(n)
             nURL=""
-            if self.types[url]==0:
-                nContent=n.contents[3].contents[1].contents[0]
-                nPic=n.contents[1].contents[1]
-            elif self.types[url]==1:
-                
-                nContent=n.contents[3].contents[0].contents[0]
-                nPic=n.contents[1].contents[0]
-                #print(nContent,nPic)
-            else:
-                #print(n.contents[1].contents)
-                nContent=n.contents[3].contents[1]
-                nPic=n.contents[1].contents[1]
-                nURL=n.contents[1]
+            try:
+                if self.types[url]==0:
+                    nContent=n.contents[3].contents[1].contents[0]
+                    nPic=n.contents[1].contents[1]
+                elif self.types[url]==1:
+                    #print(n.contents)
+                    nContent=n.contents[3].contents[0].contents[0]
+
+                    nPic=n.contents[1].contents[0]
+                    #print(nContent,nPic)
+                else:
+                    #print(n.contents[1].contents)
+                    nContent=n.contents[3].contents[1]
+                    nPic=n.contents[1].contents[1]
+                    nURL=n.contents[1]
+            except IndexError:
+                continue
             assert nContent is not None
             assert nPic is not None
             if self.types[url]==2:
@@ -230,4 +241,4 @@ def craw():
     cnn=CNNCrawler()
     cnn.craw()
     print("cnn news craw over")
-#craw() 
+craw() 
