@@ -53,7 +53,7 @@ urlpatterns = [
     path(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('test/', include('helloworld.urls')),
     path('admin/', admin.site.urls),
-    path(r'api-token-auth/', auth_views.obtain_auth_token),
+    path(r'api-token-auth/', core_views.CustomObtainAuthToken.as_view()),
     path(r'dev-token-auth/', core_views.DevAuthToken.as_view()),
     path(r'recommend_article/', reader_views.recommend_article.as_view()),
     path(r'docs/', include_docs_urls(title='LightNews API')),
