@@ -4,3 +4,5 @@ django-filter
 psycopg2
 uwsgi
 coreapi
+nltk
+requests

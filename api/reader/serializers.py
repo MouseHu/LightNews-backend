@@ -8,6 +8,7 @@ class MediaSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('url','name', 'homepage')
 
 class ArticleSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Article
         fields = ('id','url','title','abstract','source', 'author','from_media','pub_date','img_url')
