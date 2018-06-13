@@ -46,9 +46,14 @@ def get_record(list, n_return):
     data = json.dumps(data).encode(encoding='UTF8')
     print(data)
     req = Request(url, data, header)
-    response = urlopen(req)  # 调用urllib2向服务器发送get请求
-    result = response.read()
-    result = json.loads(result.decode())
+    # response = urlopen(req)  # 调用urllib2向服务器发送get请求
+
+
+    result = requests.post(url, data, header)
+    result = json.loads(result.text)
+
+    # result = response.read()
+    # result = json.loads(result.decode())
 
     assert len(result["hits"]["hits"]) <= n_return
     return_name = []
@@ -118,5 +123,5 @@ def put_record(id, title, date, content, image_url, source, other=None):
 #                  "CNN")
 # print(ret)
 # print(get_all())
-# ret = get_record(["aaa", "uhu","test"], 10)
+ret = get_record(["aaa", "uhu","test"], 10)
 # print(ret)
