@@ -97,6 +97,13 @@ class CommentlistSerializer(serializers.ModelSerializer):
         model = CommentList
         fields = ('id', 'userprofile', 'article', 'content', 'time')
 
+class DCommentlistSerializer(serializers.ModelSerializer):
+    # glossary =  WordSerializer(many=True)
+    userprofile = UserProfileSerializer()
+    class Meta:
+        model = CommentList
+        fields = ('id', 'userprofile', 'article', 'content', 'time')
+
 
 class LikeSerializer(serializers.ModelSerializer):
     # glossary =  WordSerializer(many=True)

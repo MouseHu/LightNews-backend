@@ -247,6 +247,21 @@ class CommentlistViewSet(viewsets.ModelViewSet):
 
     # TODO:权限问题未能完全解决
 
+    def list(self, request):
+        queryset = CommentList.objects.all()
+
+        userid = self.request.query_params.get('userprofile', None)
+        if userid is not None:
+            queryset = queryset.filter(userprofile=userid)
+
+        articleid=self.request.query_params.get('article', None)
+        if articleid is not None:
+            queryset = queryset.filter(article=articleid)
+
+        serializer = DCommentlistSerializer(queryset, context={'request': request}, many=True)
+        return Response(serializer.data)
+
+
     filter_fields = ('userprofile', 'article')
     queryset = CommentList.objects.all()
     serializer_class = CommentlistSerializer

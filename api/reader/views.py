@@ -28,11 +28,6 @@ class recommend_article(generics.ListAPIView):
 
 
 
-
-
-
-
-
 class ArticleViewSet(viewsets.ModelViewSet):
     """
     list:
