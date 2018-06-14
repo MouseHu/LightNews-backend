@@ -337,7 +337,7 @@ class FavouriteViewSet(viewsets.ModelViewSet):
 
     serializer_class = FavouriteSerializer
     permission_classes = (
-    permissions.IsAuthenticatedOrReadOnly, userprofile_permission)  # any one can edit itself wordlist
+    permissions.IsAuthenticatedOrReadOnly,)  # any one can edit itself wordlist
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
