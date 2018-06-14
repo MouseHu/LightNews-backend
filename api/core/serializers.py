@@ -114,11 +114,17 @@ class LikeSerializer(serializers.ModelSerializer):
 
 class FavouriteSerializer(serializers.ModelSerializer):
     # glossary =  WordSerializer(many=True)
-    article = reader_serilizer.ArticleSerializer()
+    # article = reader_serilizer.ArticleSerializer()
     class Meta:
         model = Favourites
         fields = ('id', 'userprofile', 'article')
 
+class DFavouriteSerializer(serializers.ModelSerializer):
+    # glossary =  WordSerializer(many=True)
+    article = reader_serilizer.ArticleSerializer()
+    class Meta:
+        model = Favourites
+        fields = ('id', 'userprofile', 'article')
 
 def my_md5(dev_id):
     hl = hashlib.md5()

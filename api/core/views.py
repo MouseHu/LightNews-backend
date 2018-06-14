@@ -308,6 +308,22 @@ class FavouriteViewSet(viewsets.ModelViewSet):
     删除一个收藏。
 
     """
+
+    def list(self, request):
+        queryset = Favourites.objects.all()
+
+        userid = self.request.query_params.get('userprofile', None)
+        if userid is not None:
+            queryset = queryset.filter(userprofile=userid)
+
+        articleid=self.request.query_params.get('article', None)
+        if articleid is not None:
+            queryset = queryset.filter(article=articleid)
+
+        serializer =  DFavouriteSerializer(queryset, context={'request': request}, many=True)
+        return Response(serializer.data)
+
+
     filter_fields = ('userprofile', 'article')
     queryset = Favourites.objects.all()
 
