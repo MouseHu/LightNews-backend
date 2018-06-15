@@ -43,15 +43,22 @@ router.register(r'wordlist', core_views.WordlistViewSet)
 router.register(r'userprofile', core_views.UserProfileViewSet)
 router.register(r'userwordlist', core_views.UserWordlistViewSet)
 
+router.register(r'comment', core_views.CommentlistViewSet)
+router.register(r'favourite', core_views.FavouriteViewSet,base_name='favourite')
+router.register(r'like', core_views.LikeViewSet,base_name='like')
+
+
 urlpatterns = [
     path(r'', include(router.urls)),
     path(r'api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('test/', include('helloworld.urls')),
     path('admin/', admin.site.urls),
-    path(r'api-token-auth/', auth_views.obtain_auth_token),
+    path(r'api-token-auth/', core_views.CustomObtainAuthToken.as_view()),
     path(r'dev-token-auth/', core_views.DevAuthToken.as_view()),
     path(r'recommend_article/', reader_views.recommend_article.as_view()),
-    path(r'docs/', include_docs_urls(title='LightNews API'))
+    path(r'docs/', include_docs_urls(title='LightNews API')),
+    path(r'register/', core_views.CreateUserView.as_view()),
+    path(r'checking/', core_views.Checking.as_view()),
 ]
 
 

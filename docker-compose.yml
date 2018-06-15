@@ -42,9 +42,15 @@ services:
         - db
         links:
         - db
+        - elasticsearch
 
     elasticsearch:
         image: elasticsearch:latest  
+        volumes:
+        - esdata1:/usr/share/elasticsearch/data
+        ports:
+        - "9200:9200" 
+        - "9300:9300"  
 
     adminer:
         container_name: adminer
@@ -59,4 +65,5 @@ services:
 volumes:
     socket:
     pgdata:
+    esdata1:
 

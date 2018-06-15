@@ -22,6 +22,15 @@ class wordlist_permission(permissions.BasePermission):
         return obj.userprofile.user == request.user
 
 
+
 class IsAdminOrIsSelf(permissions.BasePermission):
+    # def has_permission(self, request, view):
+    #     if request.method == 'POST':
+    #         return request.user.id == request.data["userprofile"]
+    #     return True
+
     def has_object_permission(self, request, view, obj):
-        return obj.user == request.user or request.user.is_staff or request.user.is_superuser
+        # if request.method == 'POST':
+        #     return request.user == request.data["userprofile"]
+        return obj.userprofile.user == request.user #or request.user.is_staff or request.user.is_superuser
+
